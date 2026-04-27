@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
+import { sessionStore } from "@/app/lib/store";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   // TODO: Set a secure 'session_id' cookie with value 'abc789xyz'
@@ -13,17 +14,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const cookieStore = await cookies();
 
   if (process.env.PASSWORD !== body.password) {
-    return NextResponse.json({ message: "Invalid password" }, { status: 401 });
+    return NextResponse.json({ message: "Invalid username or password" }, { status: 401 });
   }
+  
+  const response = NextResponse.json(
+    { message: "Admin access granted to " + body.user },
+    { status: 200 }
+  );
 
-  // Set session_id cookie with value 'abc789xyz'
-  cookieStore.set("session_id", "abc789xyz", {
-    httpOnly: true, // Use httpOnly
-    secure: process.env.NODE_ENV === "production", // secure in production
-    sameSite: "strict", // same site strict
-    maxAge: 60 * 60, // max age: 1 hour
-    path: "/",
+  const sessionID = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+  // store session in memory
+  sessionStore.set(sessionID, body.user);
+
+  // add session_id cookie
+  response.cookies.set("session_id", sessionID, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 60, // 1 hour
   });
 
-  return NextResponse.json({ message: "Logged in!" }, { status: 200 });
+  return response;
 }
