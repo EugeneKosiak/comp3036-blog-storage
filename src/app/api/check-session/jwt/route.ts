@@ -9,10 +9,13 @@ export async function GET(req: NextRequest) {
     throw new Error("JWT_SECRET is not defined in environment variables");
   }
 
+  // Look at header, if Authorization header is missing, reject request
   const bearerToken = req.headers.get("Authorization");
   if (!bearerToken) {
     return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
   }
+
+  // Extract token from header, if token is missing, reject request
   const tokenString = bearerToken.split(" ")[1];
   if (!tokenString || tokenString == "null") {
     return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
@@ -32,12 +35,14 @@ export async function GET(req: NextRequest) {
     );
   } catch (error: any) {
     if (error?.name === "TokenExpiredError") {
+
       // we get the refresh token and it is valid we issue a new token
       const cookieStore = await cookies();
-      const refreshCookie = cookieStore.get("refreshToken")?.value;
+      const refreshCookie = cookieStore.get("refreshToken")?.value; // remember user after JWT expires
 
       console.log(Array.from(tokenStore.keys()));
 
+      // If the user has a valid refresh token, give them a new access token. Otherwise, log them out.”
       if (refreshCookie && tokenStore.has(refreshCookie)) {
         return NextResponse.json(
           {

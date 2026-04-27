@@ -13,6 +13,8 @@ export async function POST() {
     }
     
     const response = NextResponse.json({ message: "Logged out successfully" });
+
+    // destroy the session cookie by setting it to expire immediately
     response.cookies.set("session_id", "", {
         httpOnly: true,
         secure: true,

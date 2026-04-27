@@ -75,7 +75,8 @@ export function loadDrafts(callback: (drafts: Draft[]) => void): void {
     const store = tx.objectStore("drafts");
 
     const req = store.getAll();
-
+    
+    // When the request succeeds, take the returned data and pass it into the callback function as an array of Draft objects.
     req.onsuccess = () => {
       callback(req.result as Draft[]);
     };

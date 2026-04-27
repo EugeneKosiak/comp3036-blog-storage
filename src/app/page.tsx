@@ -13,7 +13,6 @@ export default function Home() {
   const [jwtSessionStatus, setJwtSessionStatus] =
     useState<string>("Checking jwt...");
 
-
   useEffect(() => {
 
     // When page loads

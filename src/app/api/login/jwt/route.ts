@@ -37,7 +37,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     { status: 200 }
   );
 
+  // store token, so that we know this token is for this user
   tokenStore.set(refreshToken, user);
+  
+  // add session_id cookie
   response.cookies.set("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

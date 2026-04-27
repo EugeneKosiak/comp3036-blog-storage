@@ -8,7 +8,6 @@ export async function GET(): Promise<NextResponse> {
   // TODO: Check if 'session_id' cookie exists and equals 'abc789xyz'
   // Return 200 with "Admin access granted" if valid, 401 with "Unauthorized" if not
 
-
   const sessionID = cookieStore.get("session_id")?.value;
   
   if (!sessionID) {

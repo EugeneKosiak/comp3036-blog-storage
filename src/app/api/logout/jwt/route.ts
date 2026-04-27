@@ -1,8 +1,9 @@
-// TODO
 import { NextResponse } from "next/server";
 
 export async function POST() {
   const response = NextResponse.json({ message: "Logged out successfully" });
+
+  // Clear refreshToken cookie to log user out
   response.cookies.set("refreshToken", "", {
     httpOnly: true,
     secure: true,
