@@ -13,7 +13,20 @@ export default function Home() {
   const [jwtSessionStatus, setJwtSessionStatus] =
     useState<string>("Checking jwt...");
 
+
   useEffect(() => {
+
+    // When page loads
+    loadDrafts((existing) => {
+      if (existing.length === 0) { // create draft if none exist
+        saveDraft("New draft " + Date.now(), () => {
+          loadDrafts(setDrafts);
+        });
+      } else {
+        setDrafts(existing); // loads what’s already in IndexedDB
+      }
+    });
+  
     // retrieve cookie session status from the server
     fetch("/api/check-session/cookie", {
       headers: {
@@ -37,7 +50,6 @@ export default function Home() {
       })
     );
 
-    loadDrafts(setDrafts);
   }, []);
 
   return (
@@ -60,7 +72,12 @@ export default function Home() {
       <Draft />
       <div>
         <h2>Saved Drafts (IndexedDB)</h2>
-        <button onClick={() => saveDraft("New draft " + Date.now())}>
+        <button onClick={() => 
+          saveDraft("New draft " + Date.now(), () => {
+            loadDrafts(setDrafts);
+          })
+        }
+        >
           Save Draft
         </button>
         <ul>
