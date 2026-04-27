@@ -6,7 +6,12 @@ export default function Draft() {
 
   useEffect(() => {
     // TODO: Save 'draft' as 'My temp draft...' in sessionStorage when component mounts
+    sessionStorage.setItem("draft", "My temp draft...");
     // Then, read it back and set it to state
+    const saved = sessionStorage.getItem("draft");
+    if (saved) {
+      setDraft(saved);
+    }
   }, []);
 
   return (
